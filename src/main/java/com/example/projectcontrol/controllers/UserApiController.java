@@ -8,7 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import tools.jackson.databind.ObjectMapper;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -60,7 +63,7 @@ public class UserApiController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUserById(@PathVariable Long id, @Valid @RequestBody User userDetails) {
+    public ResponseEntity<?> updateUserById(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         findUser = userRepository.findById(id);
 
         if (findUser.isEmpty())
@@ -71,14 +74,34 @@ public class UserApiController {
         User existingUser = findUser.get();
 
         //Update Fields
-        existingUser.setName(userDetails.getName());
-        existingUser.setEmail(userDetails.getEmail());
+        if (updates.containsKey("name") && updates.get("name") != null) {
+            if (updates.get("name").toString().length() < User.getMinNameLength())
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(User.NAME_ERROR);
+            existingUser.setName(updates.get("name").toString());
+        }
 
-        if (userDetails.getPassword() != null && !userDetails.getPassword().isBlank())
-            existingUser.setPasswordHash(encoder.encode(userDetails.getPassword()));
+        if (updates.containsKey("email") && updates.get("email") != null){
+            if (!User.isValidEmail(updates.get("email").toString()))
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(User.EMAIL_ERROR);
+            existingUser.setEmail(updates.get("email").toString());
+        }
+
+        if (updates.containsKey("password") && updates.get("password") != null) {
+            String newPassword = updates.get("password").toString();
+
+            if (newPassword.length() < User.getMinPassLength())
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(User.PASSWORD_ERROR);
+
+            existingUser.setPasswordHash(encoder.encode(newPassword));
+        }
 
         User savedUser = userRepository.save(existingUser);
-
         return ResponseEntity.ok(savedUser);
     }
 

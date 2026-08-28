@@ -17,6 +17,7 @@ public class User implements Serializable {
     @Serial
     private static final long serialVersionUID = 2L;
 
+    // Constants
     private static final int MIN_PASS_LENGTH = 8;
     private static final int MIN_NAME_LENGTH = 3;
 
@@ -48,7 +49,6 @@ public class User implements Serializable {
     @JsonIgnore
     private String passwordHash;
 
-    // Construtor padrão obrigatório para o JPA e Jackson
     public User() {}
 
     // Getters e Setters
@@ -58,8 +58,15 @@ public class User implements Serializable {
     public String getPassword() { return password; }
     public String getPasswordHash() { return passwordHash; }
 
+    //Method Return constant values on Controller's
+    public static int getMinPassLength() { return MIN_PASS_LENGTH; }
+    public static int getMinNameLength() { return MIN_NAME_LENGTH; }
+
     public void setName(String name) { this.name = name; }
     public void setEmail(String email) { this.email = email; }
     public void setPassword(String password) { this.password = password; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+
+    //Validation E-Mail
+    public static boolean isValidEmail(String e) { return e != null && e.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"); }
 }
