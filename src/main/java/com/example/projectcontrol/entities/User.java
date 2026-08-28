@@ -1,14 +1,14 @@
 package com.example.projectcontrol.entities;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.regex.Pattern;
 
 @Entity
 @Table(name = "users")
@@ -17,81 +17,46 @@ public class User implements Serializable {
     @Serial
     private static final long serialVersionUID = 2L;
 
-    // É preferível reusar uma única instância estática ou injetar via Service
-    private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    public static final String NAME_ERROR = "Nome inválido, tem que conter no mínimo 3 caracteres.";
+    public static final String EMAIL_ERROR = "E-mail inválido.";
+    public static final String PASSWORD_ERROR = "Password inválida, tem que conter no mínimo 8 caracteres.";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = NAME_ERROR)
+    @Size(min = 3, message = NAME_ERROR)
     @Column(name = "name", nullable = false)
     private String name;
 
+    @NotBlank(message = EMAIL_ERROR)
+    @Email(message = EMAIL_ERROR)
     @Column(name = "email", nullable = false, unique = true)
     private String email;
+
+    @Transient
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotBlank(message = PASSWORD_ERROR)
+    @Size(min = 8, message = PASSWORD_ERROR)
+    private String password;
 
     @Column(name = "password_hash", nullable = false)
     @JsonIgnore
     private String passwordHash;
 
+    // Construtor padrão obrigatório para o JPA e Jackson
     public User() {}
 
-    @JsonCreator
-    public User(
-            @JsonProperty("name") String name,
-            @JsonProperty("email") String email,
-            @JsonProperty("password") String password
-    ) {
-        this.name = validName(name);
-        this.email = validEmail(email);
-        this.passwordHash = validPassword(password);
-    }
+    // Getters e Setters
+    public Long getId() { return id; }
+    public String getName() { return name; }
+    public String getEmail() { return email; }
+    public String getPassword() { return password; }
+    public String getPasswordHash() { return passwordHash; }
 
-    // ==== GETTERS ====
-    public Long getId() {
-        return id;
-    }
-    public String getName() {
-        return name;
-    }
-    public String getEmail() {
-        return email;
-    }
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    // ==== SETTERS ====
-    public void setName(String name) {
-        this.name = validName(name);
-    }
-    public void setEmail(String email) {
-        this.email = validEmail(email);
-    }
-    public void setPassword(String password) {
-        this.passwordHash = validPassword(password);
-    }
-
-    // ==== MÉTODOS DE VALIDAÇÃO ====
-    private String validName(String n) {
-        if (n == null || n.trim().length() < 3) {
-            throw new IllegalArgumentException("Nome inválido, tem que conter no mínimo 3 caracteres.");
-        }
-        return n.trim();
-    }
-
-    private String validEmail(String e) {
-        String regexEmail = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-        if (e == null || !Pattern.matches(regexEmail, e)) {
-            throw new IllegalArgumentException("E-mail inválido.");
-        }
-        return e.toLowerCase().trim();
-    }
-
-    private String validPassword(String p) {
-        if (p == null || p.length() < 8) {
-            throw new IllegalArgumentException("Password inválida, tem que conter no mínimo 8 caracteres.");
-        }
-        return encoder.encode(p);
-    }
+    public void setName(String name) { this.name = name; }
+    public void setEmail(String email) { this.email = email; }
+    public void setPassword(String password) { this.password = password; }
+    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
 }
