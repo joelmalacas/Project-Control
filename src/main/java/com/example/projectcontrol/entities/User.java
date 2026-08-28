@@ -17,16 +17,19 @@ public class User implements Serializable {
     @Serial
     private static final long serialVersionUID = 2L;
 
-    public static final String NAME_ERROR = "Nome inválido, tem que conter no mínimo 3 caracteres.";
+    private static final int MIN_PASS_LENGTH = 8;
+    private static final int MIN_NAME_LENGTH = 3;
+
+    public static final String NAME_ERROR = "Nome inválido, tem que conter no mínimo " + MIN_NAME_LENGTH + " caracteres.";
     public static final String EMAIL_ERROR = "E-mail inválido.";
-    public static final String PASSWORD_ERROR = "Password inválida, tem que conter no mínimo 8 caracteres.";
+    public static final String PASSWORD_ERROR = "Password inválida, tem que conter no mínimo " + MIN_PASS_LENGTH + " caracteres.";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = NAME_ERROR)
-    @Size(min = 3, message = NAME_ERROR)
+    @Size(min = MIN_NAME_LENGTH, message = NAME_ERROR)
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -38,7 +41,7 @@ public class User implements Serializable {
     @Transient
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotBlank(message = PASSWORD_ERROR)
-    @Size(min = 8, message = PASSWORD_ERROR)
+    @Size(min = MIN_PASS_LENGTH, message = PASSWORD_ERROR)
     private String password;
 
     @Column(name = "password_hash", nullable = false)

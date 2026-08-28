@@ -20,6 +20,8 @@ public class UserApiController {
     @Autowired
     private BCryptPasswordEncoder encoder;
 
+    private Optional<User> findUser;
+
     public UserApiController(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -47,7 +49,7 @@ public class UserApiController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        Optional<User> findUser = userRepository.findById(id);
+        findUser = userRepository.findById(id);
 
         if (findUser.isEmpty())
             return ResponseEntity
@@ -55,6 +57,29 @@ public class UserApiController {
                     .body("Utilizador não encontrado");
 
         return ResponseEntity.ok(findUser.get());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUserById(@PathVariable Long id, @Valid @RequestBody User userDetails) {
+        findUser = userRepository.findById(id);
+
+        if (findUser.isEmpty())
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Utilizador não encontrado");
+
+        User existingUser = findUser.get();
+
+        //Update Fields
+        existingUser.setName(userDetails.getName());
+        existingUser.setEmail(userDetails.getEmail());
+
+        if (userDetails.getPassword() != null && !userDetails.getPassword().isBlank())
+            existingUser.setPasswordHash(encoder.encode(userDetails.getPassword()));
+
+        User savedUser = userRepository.save(existingUser);
+
+        return ResponseEntity.ok(savedUser);
     }
 
     @DeleteMapping("/{id}")
