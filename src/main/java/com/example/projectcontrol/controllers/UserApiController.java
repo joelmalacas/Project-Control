@@ -1,5 +1,6 @@
 package com.example.projectcontrol.controllers;
 
+import com.example.projectcontrol.Services.UserService;
 import com.example.projectcontrol.entities.User;
 import com.example.projectcontrol.repository.UserRepository;
 import jakarta.validation.Valid;
@@ -19,14 +20,16 @@ import java.util.Optional;
 public class UserApiController {
     @Autowired
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @Autowired
     private BCryptPasswordEncoder encoder;
 
     private Optional<User> findUser;
 
-    public UserApiController(UserRepository userRepository) {
+    public UserApiController(UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -45,9 +48,42 @@ public class UserApiController {
 
        user.setPasswordHash(encoder.encode(user.getPassword()));
 
-        User saveduser = userRepository.save(user);
+        User saveduser = userRepository.saveAndFlush(user);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(saveduser);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody Map<String, Object> credentials) {
+        //Key Validation
+        if (!credentials.containsKey("email") || !credentials.containsKey("password"))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Email e password são obrigatórios");
+
+        //Email Valid
+        Object email = credentials.get("email");
+        if (email.toString().isBlank() || credentials.get("email").toString().trim().isEmpty())
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(User.EMAIL_ERROR);
+
+        //Password Valid
+        Object password = credentials.get("password");
+        if (password.toString().isBlank() || password.toString().length() < User.getMinPassLength())
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(User.PASSWORD_ERROR);
+
+        //Authentication Service
+        if (!userService.login(email.toString(), password.toString()))
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid credentials");
+
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body("Login Successful");
     }
 
     @GetMapping("/{id}")
