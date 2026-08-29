@@ -5,5 +5,5 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects")
-public class ProjectController {
+public class ProjectApiController {
 }

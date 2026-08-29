@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.URL;
-import org.springframework.data.annotation.Id;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -22,13 +21,13 @@ public class Project implements Serializable {
     private static final String ERROR_URL = "URL inválida";
     private static final String ERROR_BLANK = "Campo obrigatório";
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private ProjectStateEnum statusEnum;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
+
+    @Column(name = "user_id")
+    private Long userId;
 
     @NotBlank(message = ERROR_BLANK)
     @Column(name = "name", nullable = false)
@@ -50,13 +49,19 @@ public class Project implements Serializable {
     @Column(name = "production_url")
     private String URL_PROD;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private ProjectStateEnum statusEnum;
+
    public Project() {}
 
     //====GETTER'S====
-    public String getStatus() { return statusEnum.getValue(); }
     public Long getId() {
         return id;
     }
+    public Long setUserId() {
+       return userId;
+   }
     public String getName() {
         return name;
     }
@@ -68,12 +73,13 @@ public class Project implements Serializable {
     }
     public String getURL_REPO() { return URL_REPO; }
     public String getURL_PROD() { return URL_PROD; }
+    public String getStatus() { return statusEnum.getValue(); }
 
     //====SETTER'S====
-    public void setStatus(String status) { this.statusEnum = ProjectStateEnum.valueOf(status); }
     public void setId(Long id) {
         this.id = id;
     }
+    public void setUserId(Long id) { this.userId = id; }
     public void setName(String name) {
         this.name = name;
     }
@@ -85,4 +91,5 @@ public class Project implements Serializable {
     }
     public void setURL_REPO(String URL_REPO) { this.URL_REPO = URL_REPO; }
     public void setURL_PROD(String URL_PROD) { this.URL_PROD = URL_PROD; }
+    public void setStatus(String status) { this.statusEnum = ProjectStateEnum.valueOf(status); }
 }
