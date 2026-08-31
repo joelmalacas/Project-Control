@@ -1,0 +1,11 @@
+package com.example.projectcontrol.repository;
+
+import com.example.projectcontrol.entities.Project;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface ProjectRepository extends JpaRepository<Project, Long> {
+    Optional<Project> findBySignature(String signature);
+    boolean existsBySignature(String signature);
+}
