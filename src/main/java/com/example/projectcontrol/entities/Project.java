@@ -17,9 +17,9 @@ public class Project implements Serializable {
     private static final long serialVersionUID = 1L;
 
     //ERROR CONSTANTS MESSAGES
-    private static final String ERROR_SIGNATURE = "A assinatura deve ter 40 caracteres";
-    private static final String ERROR_URL = "URL inválida";
-    private static final String ERROR_BLANK = "Campo obrigatório";
+    public static final String ERROR_SIGNATURE = "A assinatura deve ter 40 caracteres";
+    public static final String ERROR_URL = "URL inválida";
+    public static final String ERROR_BLANK = "Campo obrigatório";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

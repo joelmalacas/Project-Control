@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface ProjectRepository extends JpaRepository<Project, Long> {
-    Optional<Project> findBySignature(String signature);
+    Optional<Project> findSignatureById(Long id);
     boolean existsBySignature(String signature);
 }
