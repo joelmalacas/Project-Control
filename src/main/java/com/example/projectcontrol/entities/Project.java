@@ -1,6 +1,7 @@
 package com.example.projectcontrol.entities;
 
 import com.example.projectcontrol.entities.Enum.ProjectStateEnum;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -33,25 +34,24 @@ public class Project implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description")
     private String description;
 
-    @NotBlank(message = ERROR_BLANK)
     @Size(min = 40, max = 40, message = ERROR_SIGNATURE)
     @Column(name = "signature", nullable = false)
     private String signature;
 
     @URL(message = ERROR_URL)
     @Column(name = "repository_url")
-    private String URL_REPO;
+    private String repositoryUrl;
 
     @URL(message = ERROR_URL)
     @Column(name = "production_url")
-    private String URL_PROD;
+    private String productionUrl;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private ProjectStateEnum statusEnum;
+    @Column(name = "status")
+    private ProjectStateEnum statusEnum = ProjectStateEnum.ACTIVE;
 
    public Project() {}
 
@@ -59,7 +59,7 @@ public class Project implements Serializable {
     public Long getId() {
         return id;
     }
-    public Long setUserId() {
+    public Long getUserId() {
        return userId;
    }
     public String getName() {
@@ -71,9 +71,11 @@ public class Project implements Serializable {
     public String getSignature() {
         return signature;
     }
-    public String getURL_REPO() { return URL_REPO; }
-    public String getURL_PROD() { return URL_PROD; }
-    public String getStatus() { return statusEnum.getValue(); }
+    public String getURL_REPO() { return repositoryUrl; }
+    public String getURL_PROD() { return productionUrl; }
+    public String getStatus() {
+       return statusEnum != null ? statusEnum.getValue() : null;
+   }
 
     //====SETTER'S====
     public void setId(Long id) {
@@ -89,7 +91,7 @@ public class Project implements Serializable {
     public void setSignature(String signature) {
         this.signature = signature;
     }
-    public void setURL_REPO(String URL_REPO) { this.URL_REPO = URL_REPO; }
-    public void setURL_PROD(String URL_PROD) { this.URL_PROD = URL_PROD; }
+    public void setURL_REPO(String URL_REPO) { this.repositoryUrl = URL_REPO; }
+    public void setURL_PROD(String URL_PROD) { this.productionUrl = URL_PROD; }
     public void setStatus(String status) { this.statusEnum = ProjectStateEnum.valueOf(status); }
 }

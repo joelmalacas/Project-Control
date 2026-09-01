@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
 
-    private static final int MAX_TOKENS = 20;
+    private static final int MAX_TOKENS = 10;
 
     // Guarda 1 bucket de limite por cada IP
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();

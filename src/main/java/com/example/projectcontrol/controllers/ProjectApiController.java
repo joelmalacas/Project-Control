@@ -2,7 +2,9 @@ package com.example.projectcontrol.controllers;
 
 import com.example.projectcontrol.Services.SignatureGenerateService;
 import com.example.projectcontrol.entities.Project;
+import com.example.projectcontrol.entities.User;
 import com.example.projectcontrol.repository.ProjectRepository;
+import com.example.projectcontrol.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +24,10 @@ public class ProjectApiController {
     @Autowired
     private SignatureGenerateService signatureGenerateService;
 
-    Optional<Project> findProject;
+    private Optional<Project> findProject;
+
+    //Constants
+    private static final int LENGTHSIGNATURE = 40;
 
     public ProjectApiController(ProjectRepository projectRepository, SignatureGenerateService signatureGenerateService) {
         this.projectRepository = projectRepository;
@@ -49,13 +54,24 @@ public class ProjectApiController {
 
     @PostMapping
     public ResponseEntity<?> createProject(@Valid @RequestBody Project project) {
-        if (projectRepository.existsById(project.getId()))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Project já existe");
+        if (project.getId() != null && projectRepository.existsById(project.getId()))
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Project já existe");
+
+        if (project.getUserId() == null) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Project.ERROR_BLANK);
+        }
 
         //Generate Signature
-        String signature = signatureGenerateService.generateSignature(40);
+        String signature;
+        do {
+            signature = signatureGenerateService.generateSignature(LENGTHSIGNATURE);
+        } while (projectRepository.existsBySignature(signature));
 
         project.setSignature(signature);
+        project.setURL_REPO(project.getURL_PROD());
+        project.setURL_PROD(project.getURL_REPO());
 
        Project projectSave =  projectRepository.save(project);
 
