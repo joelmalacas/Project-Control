@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -49,7 +50,9 @@ public class ProjectApiController {
 
         if (sign.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Projeto não encontrado");
-        return ResponseEntity.status(HttpStatus.OK).body(projectSign);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(Objects.requireNonNull(projectSign).getSignature());
     }
 
     @PostMapping
@@ -120,20 +123,20 @@ public class ProjectApiController {
             projectExists.setDescription(updates.get("description").toString());
         }
 
-        if (updates.containsKey("repository_url") && updates.get("repository_url") != null) {
-            if (updates.get("repository_url").toString().isEmpty())
+        if (updates.containsKey("URL_REPO") && updates.get("URL_REPO") != null) {
+            if (updates.get("URL_REPO").toString().isEmpty())
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
                         .body(Project.ERROR_BLANK);
-            projectExists.setURL_REPO(updates.get("repository_url").toString());
+            projectExists.setURL_REPO(updates.get("URL_REPO").toString());
         }
 
-        if (updates.containsKey("production_url") && updates.get("production_url") != null) {
-            if (updates.get("production_url").toString().isEmpty())
+        if (updates.containsKey("URL_PROD") && updates.get("URL_PROD") != null) {
+            if (updates.get("URL_PROD").toString().isEmpty())
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
                         .body(Project.ERROR_BLANK);
-            projectExists.setURL_PROD(updates.get("production_url").toString());
+            projectExists.setURL_PROD(updates.get("URL_PROD").toString());
         }
 
         Project saveProject = projectRepository.save(projectExists);
