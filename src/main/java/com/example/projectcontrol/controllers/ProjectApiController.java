@@ -68,6 +68,24 @@ public class ProjectApiController {
                 .body(projectRepository.findBySignature(sign));
     }
 
+    @GetMapping("/by-name/{name}/signature")
+    @ResponseBody
+    public ResponseEntity<?> findSignatureByName(@PathVariable String name) {
+        if (name.trim().isEmpty())
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Project.ERROR_BLANK);
+
+        Optional<String> project = projectRepository.findSignatureByName(name);
+
+        return project.<ResponseEntity<?>>map(s -> ResponseEntity
+                .status(HttpStatus.OK)
+                .body(s)).orElseGet(() -> ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body("Projeto não encontrado"));
+
+    }
+
     @PostMapping
     public ResponseEntity<?> createProject(@Valid @RequestBody Project project) {
         if (project.getId() != null && projectRepository.existsById(project.getId()))

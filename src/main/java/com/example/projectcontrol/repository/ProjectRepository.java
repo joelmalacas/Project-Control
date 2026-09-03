@@ -14,5 +14,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query("SELECT p.id FROM Project p WHERE p.signature = :signature")
     Optional<Project> findBySignature(@Param("signature") String signature);
 
+    @Query("SELECT p.signature FROM Project p WHERE p.name = :name")
+    Optional<String> findSignatureByName(@Param("name") String name);
+
     boolean existsBySignature(String signature);
 }
