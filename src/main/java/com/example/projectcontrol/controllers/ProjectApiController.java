@@ -2,9 +2,7 @@ package com.example.projectcontrol.controllers;
 
 import com.example.projectcontrol.Services.SignatureGenerateService;
 import com.example.projectcontrol.entities.Project;
-import com.example.projectcontrol.entities.User;
 import com.example.projectcontrol.repository.ProjectRepository;
-import com.example.projectcontrol.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,7 +41,7 @@ public class ProjectApiController {
 
     @GetMapping("/{id}/signature")
     @ResponseBody
-    public ResponseEntity<?> findSignature(@PathVariable Long id) {
+    public ResponseEntity<?> findSignatureById(@PathVariable Long id) {
         String sign = String.valueOf(projectRepository.findSignatureById(id));
 
         Project projectSign = projectRepository.findById(id).orElse(null);
@@ -53,6 +51,21 @@ public class ProjectApiController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(Objects.requireNonNull(projectSign).getSignature());
+    }
+
+    @GetMapping("/{sign}/id")
+    @ResponseBody
+    public ResponseEntity<?> findIdBySignature(@PathVariable String sign) {
+        boolean exists = projectRepository.existsBySignature(sign);
+
+        if (!exists)
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Projeto não encontrado");
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(projectRepository.findBySignature(sign));
     }
 
     @PostMapping
@@ -144,6 +157,27 @@ public class ProjectApiController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(saveProject);
+    }
+
+    @PutMapping("/{id}/generateSign")
+    public ResponseEntity<?> refreshSignature(@PathVariable Long id) {
+        Optional<Project> signRes = projectRepository.findById(id);
+
+        if (signRes.isEmpty())
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Projeto não foi encontrado");
+
+        Project project = signRes.get();
+
+        String newSign = signatureGenerateService.generateSignature(LENGTHSIGNATURE);
+
+        project.setSignature(newSign);
+        projectRepository.save(project);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(project);
     }
 
     @DeleteMapping("/{id}")
