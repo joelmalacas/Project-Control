@@ -1,6 +1,7 @@
 package com.example.projectcontrol.entities;
 
 import com.example.projectcontrol.entities.Enum.ProjectStateEnum;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -71,7 +72,9 @@ public class Project implements Serializable {
     public String getSignature() {
         return signature;
     }
+    @JsonProperty("url_REPO")
     public String getUrl_REPO() { return url_REPO; }
+    @JsonProperty("url_PROD")
     public String getUrl_PROD() { return url_PROD; }
     public String getStatus() {
         return statusEnum != null ? statusEnum.getValue() : null;
@@ -91,7 +94,9 @@ public class Project implements Serializable {
     public void setSignature(String signature) {
         this.signature = signature;
     }
+    @JsonProperty("url_REPO")
     public void setUrl_REPO(String url_REPO) { this.url_REPO = url_REPO; }
+    @JsonProperty("url_PROD")
     public void setUrl_PROD(String url_PROD) { this.url_PROD = url_PROD; }
     public void setStatus(String status) {
         if (status != null) {

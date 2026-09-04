@@ -126,8 +126,6 @@ public class ProjectApiController {
 
     @PostMapping
     public ResponseEntity<?> createProject(@RequestBody Project project) {
-        if (project.getId() != null && projectRepository.existsById(project.getId()))
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Project já existe");
         if (project.getUserId() == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Project.ERROR_BLANK);
         if (project.getStatus() == null)
