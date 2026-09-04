@@ -26,7 +26,7 @@ public class Project implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    
+
     @Column(name = "user_id")
     private Long userId;
 
@@ -43,25 +43,25 @@ public class Project implements Serializable {
 
     @URL(message = ERROR_URL)
     @Column(name = "repository_url")
-    private String repositoryUrl;
+    private String url_REPO;
 
     @URL(message = ERROR_URL)
     @Column(name = "production_url")
-    private String productionUrl;
+    private String url_PROD;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private ProjectStateEnum statusEnum = ProjectStateEnum.ACTIVE;
 
-   public Project() {}
+    public Project() {}
 
     //====GETTER'S====
     public Long getId() {
         return id;
     }
     public Long getUserId() {
-       return userId;
-   }
+        return userId;
+    }
     public String getName() {
         return name;
     }
@@ -71,11 +71,11 @@ public class Project implements Serializable {
     public String getSignature() {
         return signature;
     }
-    public String getURL_REPO() { return repositoryUrl; }
-    public String getURL_PROD() { return productionUrl; }
+    public String getUrl_REPO() { return url_REPO; }
+    public String getUrl_PROD() { return url_PROD; }
     public String getStatus() {
-       return statusEnum != null ? statusEnum.getValue() : null;
-   }
+        return statusEnum != null ? statusEnum.getValue() : null;
+    }
 
     //====SETTER'S====
     public void setId(Long id) {
@@ -91,7 +91,11 @@ public class Project implements Serializable {
     public void setSignature(String signature) {
         this.signature = signature;
     }
-    public void setURL_REPO(String URL_REPO) { this.repositoryUrl = URL_REPO; }
-    public void setURL_PROD(String URL_PROD) { this.productionUrl = URL_PROD; }
-    public void setStatus(String status) { this.statusEnum = ProjectStateEnum.valueOf(status); }
+    public void setUrl_REPO(String url_REPO) { this.url_REPO = url_REPO; }
+    public void setUrl_PROD(String url_PROD) { this.url_PROD = url_PROD; }
+    public void setStatus(String status) {
+        if (status != null) {
+            this.statusEnum = ProjectStateEnum.valueOf(status);
+        }
+    }
 }

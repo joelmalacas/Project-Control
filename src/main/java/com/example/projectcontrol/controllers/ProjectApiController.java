@@ -142,8 +142,8 @@ public class ProjectApiController {
         } while (projectRepository.existsBySignature(signature));
 
         project.setSignature(signature);
-        project.setURL_REPO(project.getURL_PROD());
-        project.setURL_PROD(project.getURL_REPO());
+        project.setUrl_PROD(project.getUrl_PROD());
+        project.setUrl_REPO(project.getUrl_REPO());
 
        Project projectSave =  projectRepository.save(project);
 
@@ -192,20 +192,20 @@ public class ProjectApiController {
             projectExists.setDescription(updates.get("description").toString());
         }
 
-        if (updates.containsKey("URL_REPO") && updates.get("URL_REPO") != null) {
+        if (updates.containsKey("url_repo") && updates.get("url_repo") != null) {
             if (updates.get("URL_REPO").toString().isEmpty())
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
                         .body(Project.ERROR_BLANK);
-            projectExists.setURL_REPO(updates.get("URL_REPO").toString());
+            projectExists.setUrl_REPO(updates.get("url_repo").toString());
         }
 
-        if (updates.containsKey("URL_PROD") && updates.get("URL_PROD") != null) {
+        if (updates.containsKey("url_prod") && updates.get("url_prod") != null) {
             if (updates.get("URL_PROD").toString().isEmpty())
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
                         .body(Project.ERROR_BLANK);
-            projectExists.setURL_PROD(updates.get("URL_PROD").toString());
+            projectExists.setUrl_PROD(updates.get("url_prod").toString());
         }
 
         Project saveProject = projectRepository.save(projectExists);
