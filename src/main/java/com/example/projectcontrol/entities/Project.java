@@ -26,8 +26,7 @@ public class Project implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
-    @NotBlank(message = ERROR_ID)
+    
     @Column(name = "user_id")
     private Long userId;
 
