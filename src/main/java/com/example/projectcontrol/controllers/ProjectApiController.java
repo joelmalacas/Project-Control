@@ -125,7 +125,7 @@ public class ProjectApiController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createProject(@Valid @RequestBody Project project) {
+    public ResponseEntity<?> createProject(@RequestBody Project project) {
         if (project.getId() != null && projectRepository.existsById(project.getId()))
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Project já existe");
 
