@@ -2,7 +2,7 @@ package com.example.projectcontrol.entities;
 
 import com.example.projectcontrol.entities.Enum.ProjectStateEnum;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -19,30 +19,31 @@ public class ProjectHistory implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @NotBlank(message = Project.ERROR_ID)
+    @NotNull(message = Project.ERROR_ID)
     @Column(name = "user_id")
-    private Long user_id;
+    private Long userId; // Nome alterado para respeitar a convenção camelCase em Java
 
-    @NotBlank(message = Project.ERROR_BLANK)
+    @NotNull(message = Project.ERROR_BLANK)
     @Enumerated(EnumType.STRING)
     @Column(name = "project_status")
     private ProjectStateEnum projectStatus;
 
-    @NotBlank(message = Project.ERROR_ID)
+    @NotNull(message = Project.ERROR_ID)
     @Column(name = "project_id")
     private Long projectId;
 
     public ProjectHistory() {}
 
-    //====GETTER'S====
+    // Getters e Setters
     public Long getId() { return id; }
-    public Long getUserId() { return user_id; }
-    public ProjectStateEnum getProjectStatus() { return projectStatus; }
-    public Long getProjectId() { return projectId; }
-
-    //====SETTER'S====
     public void setId(Long id) { this.id = id; }
-    public void setUserId(Long user_id) { this.user_id = user_id; }
+
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+
+    public ProjectStateEnum getProjectStatus() { return projectStatus; }
     public void setProjectStatus(ProjectStateEnum projectStatus) { this.projectStatus = projectStatus; }
+
+    public Long getProjectId() { return projectId; }
     public void setProjectId(Long projectId) { this.projectId = projectId; }
 }

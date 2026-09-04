@@ -3,6 +3,8 @@ package com.example.projectcontrol.controllers;
 import com.example.projectcontrol.Services.SignatureGenerateService;
 import com.example.projectcontrol.entities.Enum.ProjectStateEnum;
 import com.example.projectcontrol.entities.Project;
+import com.example.projectcontrol.entities.ProjectHistory;
+import com.example.projectcontrol.repository.ProjectHistoryRepository;
 import com.example.projectcontrol.repository.ProjectRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +26,21 @@ public class ProjectApiController {
     @Autowired
     private SignatureGenerateService signatureGenerateService;
 
+    @Autowired
+    private ProjectHistoryRepository projectHistoryRepository;
+
     private Optional<Project> findProject;
 
     //Constants
     private static final int LENGTHSIGNATURE = 40;
 
-    public ProjectApiController(ProjectRepository projectRepository, SignatureGenerateService signatureGenerateService) {
+    public ProjectApiController(ProjectRepository projectRepository,
+                                SignatureGenerateService signatureGenerateService,
+                                ProjectHistoryRepository projectHistoryRepository
+    ) {
         this.projectRepository = projectRepository;
         this.signatureGenerateService = signatureGenerateService;
+        this.projectHistoryRepository = projectHistoryRepository;
     }
 
     @GetMapping
@@ -228,28 +237,59 @@ public class ProjectApiController {
     }
 
     @PutMapping("/{id}/updateStatus")
-    public ResponseEntity<?> updateProjectStatus(@PathVariable Long id, @Valid @RequestBody Map<String, String> status) {
+    public ResponseEntity<?> updateProjectStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody Map<String, String> statusMap,
+            @RequestHeader(value = "X-User-Id", required = false) Long userId // Caso passes o ID do utilizador no cabeçalho
+    ) {
         Optional<Project> updateRes = projectRepository.findById(id);
 
-        if (updateRes.isEmpty())
+        if (updateRes.isEmpty()) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body("Projeto não encontrado");
+        }
 
         Project project = updateRes.get();
 
-        if (status.containsKey("status") && status.get("status") != null) {
-            String statusMaiuscula = status.get("status").toUpperCase();
-            if (statusMaiuscula.isEmpty())
-                return ResponseEntity
-                        .status(HttpStatus.BAD_REQUEST)
-                        .body(Project.ERROR_BLANK);
-            project.setStatus(String.valueOf(ProjectStateEnum.valueOf(statusMaiuscula)));
+        if (!statusMap.containsKey("status") || statusMap.get("status") == null) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Project.ERROR_BLANK);
         }
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(project);
+        String statusStr = statusMap.get("status").trim().toUpperCase();
+
+        if (statusStr.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Project.ERROR_BLANK);
+        }
+
+        try {
+            ProjectStateEnum novoEstado = ProjectStateEnum.valueOf(statusStr);
+
+            // 1. Atualiza a entidade principal
+            project.setStatus(novoEstado.name());
+            projectRepository.save(project);
+
+            // 2. Regista o evento na tabela de histórico (ProjectHistory)
+            ProjectHistory history = new ProjectHistory();
+            history.setProjectId(project.getId());
+            history.setProjectStatus(novoEstado);
+
+            // Atribui o ID do utilizador (podes ajustar para obter da sessão/JWT/header)
+            history.setUserId(userId != null ? userId : 1L);
+
+            projectHistoryRepository.save(history);
+
+            return ResponseEntity.ok(project);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Estado inválido fornecido.");
+        }
     }
 
     @DeleteMapping("/{id}")
