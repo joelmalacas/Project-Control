@@ -128,26 +128,24 @@ public class ProjectApiController {
     public ResponseEntity<?> createProject(@RequestBody Project project) {
         if (project.getId() != null && projectRepository.existsById(project.getId()))
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Project já existe");
+        if (project.getUserId() == null)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Project.ERROR_BLANK);
+        if (project.getStatus() == null)
+            project.setStatus("ACTIVE");
 
-        if (project.getUserId() == null) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(Project.ERROR_BLANK);
-        }
-
-        //Generate Signature
         String signature;
         do {
             signature = signatureGenerateService.generateSignature(LENGTHSIGNATURE);
         } while (projectRepository.existsBySignature(signature));
 
         project.setSignature(signature);
-        project.setUrl_PROD(project.getUrl_PROD());
-        project.setUrl_REPO(project.getUrl_REPO());
 
-       Project projectSave =  projectRepository.save(project);
-
-       return ResponseEntity.status(HttpStatus.CREATED).body(projectSave);
+        try {
+            Project projectSave = projectRepository.save(project);
+            return ResponseEntity.status(HttpStatus.CREATED).body(projectSave);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Dados inválidos: " + e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
