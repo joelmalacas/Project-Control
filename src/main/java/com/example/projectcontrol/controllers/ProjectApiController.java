@@ -1,6 +1,7 @@
 package com.example.projectcontrol.controllers;
 
 import com.example.projectcontrol.Services.SignatureGenerateService;
+import com.example.projectcontrol.entities.Enum.ProjectStateEnum;
 import com.example.projectcontrol.entities.Project;
 import com.example.projectcontrol.repository.ProjectRepository;
 import jakarta.validation.Valid;
@@ -84,6 +85,34 @@ public class ProjectApiController {
                 .status(HttpStatus.NOT_FOUND)
                 .body("Projeto não encontrado"));
 
+    }
+
+    @GetMapping("/{id}/status")
+    public ResponseEntity<?> findStatusById(@PathVariable Long id) {
+        findProject = projectRepository.findById(id);
+
+        return findProject.<ResponseEntity<?>>map(project -> ResponseEntity
+                .status(HttpStatus.OK)
+                .body(project.getStatus())).orElseGet(() -> ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body("Projeto não encontrado"));
+
+    }
+
+    @GetMapping("/by-name/{name}/status")
+    public ResponseEntity<?> findStatusByName(@PathVariable String name) {
+        if (name.trim().isEmpty())
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Project.ERROR_BLANK);
+
+       Optional<String> project = projectRepository.findStatusByName(name);
+
+        return project.<ResponseEntity<?>>map(s -> ResponseEntity
+                .status(HttpStatus.OK)
+                .body(s)).orElseGet(() -> ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body("Projeto não encontrado"));
     }
 
     @PostMapping
@@ -192,6 +221,31 @@ public class ProjectApiController {
 
         project.setSignature(newSign);
         projectRepository.save(project);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(project);
+    }
+
+    @PutMapping("/{id}/updateStatus")
+    public ResponseEntity<?> updateProjectStatus(@PathVariable Long id, @Valid @RequestBody Map<String, String> status) {
+        Optional<Project> updateRes = projectRepository.findById(id);
+
+        if (updateRes.isEmpty())
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Projeto não encontrado");
+
+        Project project = updateRes.get();
+
+        if (status.containsKey("status") && status.get("status") != null) {
+            String statusMaiuscula = status.get("status").toUpperCase();
+            if (statusMaiuscula.isEmpty())
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(Project.ERROR_BLANK);
+            project.setStatus(String.valueOf(ProjectStateEnum.valueOf(statusMaiuscula)));
+        }
 
         return ResponseEntity
                 .status(HttpStatus.OK)

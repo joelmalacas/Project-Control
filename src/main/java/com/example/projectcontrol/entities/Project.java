@@ -1,7 +1,6 @@
 package com.example.projectcontrol.entities;
 
 import com.example.projectcontrol.entities.Enum.ProjectStateEnum;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -18,6 +17,7 @@ public class Project implements Serializable {
     private static final long serialVersionUID = 1L;
 
     //ERROR CONSTANTS MESSAGES
+    public static final String ERROR_ID = "ID inválido";
     public static final String ERROR_SIGNATURE = "A assinatura deve ter 40 caracteres";
     public static final String ERROR_URL = "URL inválida";
     public static final String ERROR_BLANK = "Campo obrigatório";
@@ -27,6 +27,7 @@ public class Project implements Serializable {
     @Column(name = "id")
     private Long id;
 
+    @NotBlank(message = ERROR_ID)
     @Column(name = "user_id")
     private Long userId;
 
