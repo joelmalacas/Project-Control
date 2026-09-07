@@ -1,23 +1,20 @@
 package com.example.projectcontrol.Services;
 
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "secretkey_projectcontrol";
+    private final SecretKey key = Jwts.SIG.HS256.key().build();
     private static final long EXPIRATION_TIME = 864000000;
 
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+        return this.key;
     }
 
     public String generateToken(String email) {
