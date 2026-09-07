@@ -1,4 +1,4 @@
-package com.example.projectcontrol.config;
+package com.example.projectcontrol.Security;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;

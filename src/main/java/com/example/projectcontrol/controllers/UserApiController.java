@@ -1,8 +1,11 @@
 package com.example.projectcontrol.controllers;
 
+import com.example.projectcontrol.Services.JwtService;
+import com.example.projectcontrol.Services.TokenBlacklistService;
 import com.example.projectcontrol.Services.UserService;
 import com.example.projectcontrol.entities.User;
 import com.example.projectcontrol.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,15 +24,23 @@ public class UserApiController {
     @Autowired
     private final UserRepository userRepository;
     private final UserService userService;
+    private final JwtService jwtService;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Autowired
     private BCryptPasswordEncoder encoder;
 
     private Optional<User> findUser;
 
-    public UserApiController(UserRepository userRepository, UserService userService) {
+    public UserApiController(UserRepository userRepository,
+                             UserService userService,
+                             JwtService jwtService,
+                             TokenBlacklistService tokenBlacklistService
+    ) {
         this.userRepository = userRepository;
         this.userService = userService;
+        this.jwtService = jwtService;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     @GetMapping
@@ -81,9 +92,26 @@ public class UserApiController {
                     .status(HttpStatus.UNAUTHORIZED)
                     .body("Invalid credentials");
 
+        String token = jwtService.generateToken(email.toString());
+
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body("Login Successful");
+                .body(Map.of("message", "Login Successful",
+                        "token", token
+                ));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            tokenBlacklistService.blacklistToken(token);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body("Logout com sucesso");
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Logout com sucesso");
     }
 
     @GetMapping("/{id}")
