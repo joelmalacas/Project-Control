@@ -66,8 +66,10 @@ public class SecurityConfig {
                 "http://localhost:4200",
                 "http://localhost:8080",
                 "https://malacas.pt:8080",
-                "http://malacas.pt:8080",
-                "http://192.168.1.81:8080"));
+                "http://192.168.1.81:8080",
+                "https://salley-pursiest-apparently.ngrok-free.app:8080",
+                "https://salley-pursiest-apparently.ngrok-free.app:4040",
+                "https://salley-pursiest-apparently.ngrok-free.app"));
 
         // Se quiseres permitir QUALQUER origem em desenvolvimento (não recomendado em produção com credenciais):
         // configuration.addAllowedOriginPattern("*");
