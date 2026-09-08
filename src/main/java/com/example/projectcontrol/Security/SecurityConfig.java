@@ -53,37 +53,31 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Origens permitidas (ex: Angular, React, Vue ou Postman)
-        // Em desenvolvimento podes usar "http://localhost:4200", "http://localhost:3000", etc.
-        configuration.setAllowedOrigins(List.of("http://localhost:3000",
-                "http://localhost:4200",
-                "http://localhost:8080",
+        // Origens permitidas
+        configuration.setAllowedOrigins(List.of(
                 "https://malacas.pt",
-                "http://192.168.1.81:8080",
-                "https://salley-pursiest-apparently.ngrok-free.app:8080",
-                "https://salley-pursiest-apparently.ngrok-free.app:4040",
-                "https://salley-pursiest-apparently.ngrok-free.app"));
-
-        // Se quiseres permitir QUALQUER origem em desenvolvimento (não recomendado em produção com credenciais):
-        // configuration.addAllowedOriginPattern("*");
+                "https://salley-pursiest-apparently.ngrok-free.app"
+        ));
 
         // Métodos HTTP permitidos
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 
-        // Cabeçalhos permitidos nos pedidos (incluindo o Authorization para o JWT)
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
+        // Aceita qualquer header no pedido (Authorization, Content-Type,
+        // ngrok-skip-browser-warning, etc.) — evita ter de listar cada um
+        // manualmente. Funciona com allowCredentials(true) porque o Spring
+        // devolve o valor exato do Origin em vez de "*" quando há credenciais.
+        configuration.setAllowedHeaders(List.of("*"));
 
         // Cabeçalhos expostos na resposta ao cliente
         configuration.setExposedHeaders(List.of("Authorization"));
 
-        // Permitir envio de cookies / credenciais se necessário
+        // Permitir envio de cookies / credenciais
         configuration.setAllowCredentials(true);
 
         // Tempo de cache da resposta do preflight (em segundos)
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // Aplica esta configuração a todos os endpoints (/api/** ou /**)
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
