@@ -36,19 +36,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users", "/api/users/login").permitAll()
                         .anyRequest().authenticated()
                 )
-
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
@@ -62,7 +58,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of("http://localhost:3000",
                 "http://localhost:4200",
                 "http://localhost:8080",
-                "https://malacas.pt:8080",
+                "https://malacas.pt",
                 "http://192.168.1.81:8080",
                 "https://salley-pursiest-apparently.ngrok-free.app:8080",
                 "https://salley-pursiest-apparently.ngrok-free.app:4040",
