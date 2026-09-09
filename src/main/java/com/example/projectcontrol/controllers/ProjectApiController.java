@@ -265,16 +265,13 @@ public class ProjectApiController {
         try {
             ProjectStateEnum novoEstado = ProjectStateEnum.valueOf(statusStr);
 
-            // 1. Atualiza a entidade principal
             project.setStatus(novoEstado.name());
             projectRepository.save(project);
 
-            // 2. Regista o evento na tabela de histórico (ProjectHistory)
             ProjectHistory history = new ProjectHistory();
             history.setProjectId(project.getId());
             history.setProjectStatus(novoEstado);
 
-            // Atribui o ID do utilizador (podes ajustar para obter da sessão/JWT/header)
             history.setUserId(userId != null ? userId : 1L);
 
             projectHistoryRepository.save(history);
