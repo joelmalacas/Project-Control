@@ -172,37 +172,19 @@ public class ProjectApiController {
         Project projectExists = findProject.get();
 
         //Update Fields
-        if (updates.containsKey("name") && updates.get("name") != null) {
-            if (updates.get("name").toString().isEmpty())
+        String[] inputs = {"name", "description", "url_repo", "url_repo"};
+
+        for (String input : inputs) {
+            if (updates.containsKey(input) && updates.get(input) != null)
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
                         .body(Project.ERROR_BLANK);
-            projectExists.setName(updates.get("name").toString());
         }
 
-        if (updates.containsKey("description") && updates.get("description") != null) {
-            if (updates.get("description").toString().isEmpty())
-                return ResponseEntity
-                        .status(HttpStatus.BAD_REQUEST)
-                        .body(Project.ERROR_BLANK);
-            projectExists.setDescription(updates.get("description").toString());
-        }
-
-        if (updates.containsKey("url_repo") && updates.get("url_repo") != null) {
-            if (updates.get("URL_REPO").toString().isEmpty())
-                return ResponseEntity
-                        .status(HttpStatus.BAD_REQUEST)
-                        .body(Project.ERROR_BLANK);
-            projectExists.setUrl_REPO(updates.get("url_repo").toString());
-        }
-
-        if (updates.containsKey("url_prod") && updates.get("url_prod") != null) {
-            if (updates.get("URL_PROD").toString().isEmpty())
-                return ResponseEntity
-                        .status(HttpStatus.BAD_REQUEST)
-                        .body(Project.ERROR_BLANK);
-            projectExists.setUrl_PROD(updates.get("url_prod").toString());
-        }
+        projectExists.setName(updates.get("name").toString());
+        projectExists.setDescription(updates.get("description").toString());
+        projectExists.setUrl_REPO(updates.get("url_repo").toString());
+        projectExists.setUrl_PROD(updates.get("url_prod").toString());
 
         Project saveProject = projectRepository.save(projectExists);
 
@@ -236,7 +218,7 @@ public class ProjectApiController {
     public ResponseEntity<?> updateProjectStatus(
             @PathVariable Long id,
             @Valid @RequestBody Map<String, String> statusMap,
-            @RequestHeader(value = "X-User-Id", required = false) Long userId // Caso passes o ID do utilizador no cabeçalho
+            @RequestHeader(value = "X-User-Id", required = false) Long userId
     ) {
         Optional<Project> updateRes = projectRepository.findById(id);
 
