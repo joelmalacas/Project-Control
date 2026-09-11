@@ -1,11 +1,9 @@
 package com.example.projectcontrol.controllers;
 
-import com.example.projectcontrol.Services.SignatureGenerateService;
+import com.example.projectcontrol.Services.*;
+import com.example.projectcontrol.entities.*;
 import com.example.projectcontrol.entities.Enum.ProjectStateEnum;
-import com.example.projectcontrol.entities.Project;
-import com.example.projectcontrol.entities.ProjectHistory;
-import com.example.projectcontrol.repository.ProjectHistoryRepository;
-import com.example.projectcontrol.repository.ProjectRepository;
+import com.example.projectcontrol.repository.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -175,16 +173,24 @@ public class ProjectApiController {
         String[] inputs = {"name", "description", "url_repo", "url_repo"};
 
         for (String input : inputs) {
-            if (updates.containsKey(input) && updates.get(input) != null)
-                return ResponseEntity
-                        .status(HttpStatus.BAD_REQUEST)
-                        .body(Project.ERROR_BLANK);
+            if (updates.containsKey(input)) {
+                Object value = updates.get(input);
+                if (value == null || value.toString().trim().isEmpty()) {
+                    return ResponseEntity
+                            .status(HttpStatus.BAD_REQUEST)
+                            .body(Project.ERROR_BLANK);
+                }
+            }
         }
 
-        projectExists.setName(updates.get("name").toString());
-        projectExists.setDescription(updates.get("description").toString());
-        projectExists.setUrl_REPO(updates.get("url_repo").toString());
-        projectExists.setUrl_PROD(updates.get("url_prod").toString());
+        if (updates.containsKey("name"))
+            projectExists.setName(updates.get("name").toString());
+        if (updates.containsKey("description"))
+            projectExists.setDescription(updates.get("description").toString());
+        if (updates.containsKey("url_repo"))
+            projectExists.setUrl_REPO(updates.get("url_repo").toString());
+        if (updates.containsKey("url_prod"))
+            projectExists.setUrl_PROD(updates.get("url_prod").toString());
 
         Project saveProject = projectRepository.save(projectExists);
 
