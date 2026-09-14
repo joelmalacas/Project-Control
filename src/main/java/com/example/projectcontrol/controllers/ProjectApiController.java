@@ -41,6 +41,11 @@ public class ProjectApiController {
         this.projectHistoryRepository = projectHistoryRepository;
     }
 
+    /*
+    * ================
+    * +  GETMapping  +
+    * ================
+    */
     @GetMapping
     @ResponseBody
     public List<Project> findAll() {
@@ -122,6 +127,42 @@ public class ProjectApiController {
                 .body("Projeto não encontrado"));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> findById(@PathVariable Long id) {
+        findProject = projectRepository.findById(id);
+
+        if (findProject.isEmpty())
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Projeto não encontrado");
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(findProject.get());
+    }
+
+    @GetMapping("/{id}/history")
+    public ResponseEntity<?> listHistory(@PathVariable Long id) {
+        findProject = projectRepository.findById(id);
+        Optional<ProjectHistory> history = projectHistoryRepository.findById(id);
+
+        if (findProject.isEmpty())
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Projeto não encontrado");
+
+        List<ProjectHistory> historyList = projectHistoryRepository.findByProjectId(id);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(historyList);
+    }
+
+    /*
+     * ================
+     * +  POSTMapping  +
+     * ================
+     */
     @PostMapping
     public ResponseEntity<?> createProject(@RequestBody Project project) {
         if (project.getUserId() == null)
@@ -144,20 +185,11 @@ public class ProjectApiController {
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable Long id) {
-        findProject = projectRepository.findById(id);
-
-        if (findProject.isEmpty())
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body("Projeto não encontrado");
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(findProject.get());
-    }
-
+    /*
+     * ================
+     * +  PUTMapping  +
+     * ================
+     */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProject(@PathVariable Long id, @Valid @RequestBody Map<String, Object> updates) {
         findProject = projectRepository.findById(id);
@@ -273,6 +305,12 @@ public class ProjectApiController {
         }
     }
 
+
+    /*
+     * ================
+     * +  DELMapping  +
+     * ================
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProject(@PathVariable Long id) {
        findProject = projectRepository.findById(id);
