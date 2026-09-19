@@ -168,7 +168,7 @@ public class ProjectApiController {
         if (project.getUserId() == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Project.ERROR_BLANK);
         if (project.getStatus() == null)
-            project.setStatus("ACTIVE");
+            project.setStatus(String.valueOf(ProjectStateEnum.ACTIVE));
 
         String signature;
         do {
