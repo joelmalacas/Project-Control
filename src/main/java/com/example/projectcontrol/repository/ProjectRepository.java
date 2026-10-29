@@ -20,5 +20,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query("SELECT p.statusEnum FROM Project p WHERE p.name = :name")
     Optional<String> findStatusByName(@Param("name") String name);
 
+    @Query("SELECT p.statusEnum FROM Project p WHERE p.signature = :signature")
+    Optional<String> findStatusBySignature(@Param("signature") String signature);
+
     boolean existsBySignature(String signature);
 }

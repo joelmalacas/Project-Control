@@ -99,6 +99,21 @@ public class ProjectApiController {
 
     }
 
+    @GetMapping("/by-signature/{sign}/status")
+    public ResponseEntity<?> StatusBySign(@PathVariable String sign) {
+        if (sign.trim().isEmpty())
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Project.ERROR_BLANK);
+        Optional<String> project = projectRepository.findStatusBySignature(sign);
+
+        return project.<ResponseEntity<?>>map(s -> ResponseEntity
+                .status(HttpStatus.OK)
+                .body(s)).orElseGet(() -> ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body("Projeto não encontrado"));
+    }
+
     @GetMapping("/{id}/status")
     public ResponseEntity<?> findStatusById(@PathVariable Long id) {
         findProject = projectRepository.findById(id);
